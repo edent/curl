@@ -1081,9 +1081,27 @@ static ParameterError parse_url(struct GlobalConfig *global,
       while(my_get_line(f, &line, &error)) {
         /* every line has a newline that we strip off */
         size_t len = curlx_dyn_len(&line);
+        const char *ptr;
         if(len)
           curlx_dyn_setlen(&line, len - 1);
-        err = add_url(global, config, curlx_dyn_ptr(&line), TRUE);
+        ptr = curlx_dyn_ptr(&line);
+        /* line with # in the first non-blank column is a comment! */
+        while(*ptr && ISSPACE(*ptr))
+          ptr++;
+
+        switch(*ptr) {
+        case '#':
+        case '/':
+        case '\r':
+        case '\n':
+        case '*':
+        case '\0':
+          /* comment or weird line, skip it */
+          break;
+        default:
+          err = add_url(global, config, ptr, TRUE);
+          break;
+        }
         if(err)
           break;
         curlx_dyn_reset(&line);

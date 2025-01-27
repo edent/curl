@@ -42,3 +42,6 @@ load the list of URLs from stdin by providing an argument like `@-`.
 When downloading URLs given in a file, it implies using --remote-name for each
 provided URL. The URLs are full, there is no globbing applied or done on
 these. Features such as --skip-existing work fine in combination with this.
+
+Lines in the URL file that start with `#` are treated as comments and will be
+skipped.
