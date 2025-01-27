@@ -1050,7 +1050,7 @@ static ParameterError add_url(struct GlobalConfig *global,
     err = getstr(&url->url, thisurl, DENY_BLANK);
     url->flags |= GETOUT_URL;
     if(addremote)
-      url->flags |= GETOUT_USEREMOTE;
+      url->flags |= GETOUT_USEREMOTE | GETOUT_NOGLOB;
     if(!err && (++config->num_urls > 1) && (config->etag_save_file ||
                                             config->etag_compare_file)) {
       errorf(global, "The etag options only work on a single URL");
