@@ -10,6 +10,8 @@ Multi: append
 See-also:
   - next
   - config
+  - path-as-is
+  - disallow-username-in-url
 Example:
   - --url $URL
   - --url @file
