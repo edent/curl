@@ -1019,7 +1019,7 @@ const struct LongShort *findlongopt(const char *opt)
 static ParameterError add_url(struct GlobalConfig *global,
                               struct OperationConfig *config,
                               const char *thisurl,
-                              bool addremote)
+                              int extraflags)
 {
   ParameterError err = PARAM_OK;
   struct getout *url;
@@ -1048,11 +1048,9 @@ static ParameterError add_url(struct GlobalConfig *global,
   else {
     /* fill in the URL */
     err = getstr(&url->url, thisurl, DENY_BLANK);
-    url->flags |= GETOUT_URL;
-    if(addremote)
-      url->flags |= GETOUT_USEREMOTE | GETOUT_NOGLOB;
-    if(!err && (++config->num_urls > 1) && (config->etag_save_file ||
-                                            config->etag_compare_file)) {
+    url->flags |= GETOUT_URL | extraflags;
+    if(!err && (++config->num_urls > 1) &&
+       (config->etag_save_file || config->etag_compare_file)) {
       errorf(global, "The etag options only work on a single URL");
       return PARAM_BAD_USE;
     }
@@ -1099,7 +1097,7 @@ static ParameterError parse_url(struct GlobalConfig *global,
           /* comment or weird line, skip it */
           break;
         default:
-          err = add_url(global, config, ptr, TRUE);
+          err = add_url(global, config, ptr, GETOUT_USEREMOTE | GETOUT_NOGLOB);
           break;
         }
         if(err)
@@ -1115,7 +1113,7 @@ static ParameterError parse_url(struct GlobalConfig *global,
     }
     return PARAM_READ_ERROR; /* file not found */
   }
-  return add_url(global, config, nextarg, FALSE);
+  return add_url(global, config, nextarg, 0);
 }
 
 
