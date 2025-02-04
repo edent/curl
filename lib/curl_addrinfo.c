@@ -317,7 +317,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
     switch(ai->ai_family) {
     case AF_INET:
-      addr = (struct sockaddr_in *)ai->ai_addr; /* storage area */
+      addr = (void *)ai->ai_addr; /* storage area */
       memcpy(&addr->sin_addr, curr, sizeof(struct in_addr));
       addr->sin_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr->sin_port = htons((unsigned short)port);
@@ -325,7 +325,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
 #ifdef USE_IPV6
     case AF_INET6:
-      addr6 = (struct sockaddr_in6 *)ai->ai_addr; /* storage area */
+      addr6 = (void *)ai->ai_addr; /* storage area */
       memcpy(&addr6->sin6_addr, curr, sizeof(struct in6_addr));
       addr6->sin6_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr6->sin6_port = htons((unsigned short)port);
