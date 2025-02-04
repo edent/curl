@@ -163,11 +163,12 @@ Curl_getaddrinfo_ex(const char *nodename,
     ca->ai_canonname = NULL;
     ca->ai_next      = NULL;
 
-    ca->ai_addr = (void *)((char *)ca + sizeof(struct Curl_addrinfo));
+    ca->ai_addr = (struct sockaddr *)
+      ((char *)ca + sizeof(struct Curl_addrinfo));
     memcpy(ca->ai_addr, ai->ai_addr, ss_size);
 
     if(namelen) {
-      ca->ai_canonname = (void *)((char *)ca->ai_addr + ss_size);
+      ca->ai_canonname = ((char *)ca->ai_addr + ss_size);
       memcpy(ca->ai_canonname, ai->ai_canonname, namelen);
     }
 
@@ -290,7 +291,8 @@ Curl_he2ai(const struct hostent *he, int port)
       break;
     }
     /* put the address after the struct */
-    ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
+    ai->ai_addr = (struct sockaddr *)
+      ((char *)ai + sizeof(struct Curl_addrinfo));
     /* then put the name after the address */
     ai->ai_canonname = (char *)ai->ai_addr + ss_size;
     memcpy(ai->ai_canonname, he->h_name, namelen);
@@ -315,8 +317,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
     switch(ai->ai_family) {
     case AF_INET:
-      addr = (void *)ai->ai_addr; /* storage area for this info */
-
+      addr = (struct sockaddr_in *)ai->ai_addr; /* storage area */
       memcpy(&addr->sin_addr, curr, sizeof(struct in_addr));
       addr->sin_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr->sin_port = htons((unsigned short)port);
@@ -324,8 +325,7 @@ Curl_he2ai(const struct hostent *he, int port)
 
 #ifdef USE_IPV6
     case AF_INET6:
-      addr6 = (void *)ai->ai_addr; /* storage area for this info */
-
+      addr6 = (struct sockaddr_in6 *)ai->ai_addr; /* storage area */
       memcpy(&addr6->sin6_addr, curr, sizeof(struct in6_addr));
       addr6->sin6_family = (CURL_SA_FAMILY_T)(he->h_addrtype);
       addr6->sin6_port = htons((unsigned short)port);
@@ -355,7 +355,8 @@ Curl_he2ai(const struct hostent *he, int port)
  */
 
 struct Curl_addrinfo *
-Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
+Curl_ip2addr(CURL_SA_FAMILY_T af, const void *inaddr, const char *hostname,
+             int port)
 {
   struct Curl_addrinfo *ai;
   size_t addrsize;
@@ -383,7 +384,7 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
   if(!ai)
     return NULL;
   /* put the address after the struct */
-  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
+  ai->ai_addr = (struct sockaddr *)((char *)ai + sizeof(struct Curl_addrinfo));
   /* then put the name after the address */
   ai->ai_canonname = (char *)ai->ai_addr + addrsize;
   memcpy(ai->ai_canonname, hostname, namelen);
@@ -394,27 +395,19 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
 
   switch(af) {
   case AF_INET:
-    addr = (void *)ai->ai_addr; /* storage area for this info */
+    addr = (struct sockaddr_in *)ai->ai_addr; /* storage area */
 
     memcpy(&addr->sin_addr, inaddr, sizeof(struct in_addr));
-#ifdef __MINGW32__
-    addr->sin_family = (short)af;
-#else
-    addr->sin_family = (CURL_SA_FAMILY_T)af;
-#endif
+    addr->sin_family = af;
     addr->sin_port = htons((unsigned short)port);
     break;
 
 #ifdef USE_IPV6
   case AF_INET6:
-    addr6 = (void *)ai->ai_addr; /* storage area for this info */
+    addr6 = (struct sockaddr_in6 *)ai->ai_addr; /* storage area */
 
     memcpy(&addr6->sin6_addr, inaddr, sizeof(struct in6_addr));
-#ifdef __MINGW32__
-    addr6->sin6_family = (short)af;
-#else
-    addr6->sin6_family = (CURL_SA_FAMILY_T)af;
-#endif
+    addr6->sin6_family = af;
     addr6->sin6_port = htons((unsigned short)port);
     break;
 #endif
@@ -462,9 +455,9 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
   ai = calloc(1, sizeof(struct Curl_addrinfo) + sizeof(struct sockaddr_un));
   if(!ai)
     return NULL;
-  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
+  ai->ai_addr = (struct sockaddr *)((char *)ai + sizeof(struct Curl_addrinfo));
 
-  sa_un = (void *) ai->ai_addr;
+  sa_un = (struct sockaddr_un *) ai->ai_addr;
   sa_un->sun_family = AF_UNIX;
 
   /* sun_path must be able to store the NUL-terminated path */
@@ -562,13 +555,13 @@ void Curl_addrinfo_set_port(struct Curl_addrinfo *addrinfo, int port)
   for(ca = addrinfo; ca != NULL; ca = ca->ai_next) {
     switch(ca->ai_family) {
     case AF_INET:
-      addr = (void *)ca->ai_addr; /* storage area for this info */
+      addr = (struct sockaddr_in *)ca->ai_addr; /* storage area */
       addr->sin_port = htons((unsigned short)port);
       break;
 
 #ifdef USE_IPV6
     case AF_INET6:
-      addr6 = (void *)ca->ai_addr; /* storage area for this info */
+      addr6 = (struct sockaddr_in6 *)ca->ai_addr; /* storage area */
       addr6->sin6_port = htons((unsigned short)port);
       break;
 #endif
