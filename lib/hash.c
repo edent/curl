@@ -389,6 +389,13 @@ void Curl_hash_offt_init(struct Curl_hash *h,
   Curl_hash_init(h, slots, Curl_hash_str, Curl_str_key_compare, dtor);
 }
 
+#ifdef __INTEL_COMPILER
+#  pragma warning(push)
+#  pragma warning(disable:2312)
+/* error #2312: pointer cast involving 64-bit pointed-to type
+   on the (char *)&id typecasts below */
+#endif
+
 void *Curl_hash_offt_set(struct Curl_hash *h, curl_off_t id, void *elem)
 {
   return Curl_hash_add(h, (char *)&id, sizeof(id), elem);
@@ -403,3 +410,7 @@ void *Curl_hash_offt_get(struct Curl_hash *h, curl_off_t id)
 {
   return Curl_hash_pick(h, (char *)&id, sizeof(id));
 }
+
+#ifdef __INTEL_COMPILER
+#  pragma warning(pop)
+#endif
