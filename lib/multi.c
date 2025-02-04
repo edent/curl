@@ -349,8 +349,11 @@ static size_t fd_key_compare(const char *k1, size_t k1_len,
 
 static size_t hash_fd(const char *key, size_t key_length, size_t slots_num)
 {
-  curl_socket_t fd = *((curl_socket_t *) key);
+  curl_socket_t fd;
+  DEBUGASSERT(sizeof(fd) == key_length);
   (void) key_length;
+
+  memcpy(&fd, key, key_length);
 
   return (fd % (curl_socket_t)slots_num);
 }
