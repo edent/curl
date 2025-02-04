@@ -395,7 +395,7 @@ Curl_ip2addr(CURL_SA_FAMILY_T af, const void *inaddr, const char *hostname,
 
   switch(af) {
   case AF_INET:
-    addr = (struct sockaddr_in *)ai->ai_addr; /* storage area */
+    addr = (void *)ai->ai_addr; /* storage area */
 
     memcpy(&addr->sin_addr, inaddr, sizeof(struct in_addr));
     addr->sin_family = af;
@@ -404,7 +404,7 @@ Curl_ip2addr(CURL_SA_FAMILY_T af, const void *inaddr, const char *hostname,
 
 #ifdef USE_IPV6
   case AF_INET6:
-    addr6 = (struct sockaddr_in6 *)ai->ai_addr; /* storage area */
+    addr6 = (void *)ai->ai_addr; /* storage area */
 
     memcpy(&addr6->sin6_addr, inaddr, sizeof(struct in6_addr));
     addr6->sin6_family = af;
