@@ -553,13 +553,13 @@ void Curl_addrinfo_set_port(struct Curl_addrinfo *addrinfo, int port)
   for(ca = addrinfo; ca != NULL; ca = ca->ai_next) {
     switch(ca->ai_family) {
     case AF_INET:
-      addr = (struct sockaddr_in *)ca->ai_addr; /* storage area */
+      addr = (void *)ca->ai_addr; /* storage area */
       addr->sin_port = htons((unsigned short)port);
       break;
 
 #ifdef USE_IPV6
     case AF_INET6:
-      addr6 = (struct sockaddr_in6 *)ca->ai_addr; /* storage area */
+      addr6 = (void *)ca->ai_addr; /* storage area */
       addr6->sin6_port = htons((unsigned short)port);
       break;
 #endif
