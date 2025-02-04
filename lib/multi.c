@@ -343,9 +343,8 @@ static void sh_freeentry(void *freethis)
 static size_t fd_key_compare(const char *k1, size_t k1_len,
                              const char *k2, size_t k2_len)
 {
-  (void) k1_len; (void) k2_len;
-
-  return (*((curl_socket_t *) k1)) == (*((curl_socket_t *) k2));
+  (void) k2_len;
+  return !memcmp(k1, k2, k1_len);
 }
 
 static size_t hash_fd(const char *key, size_t key_length, size_t slots_num)
