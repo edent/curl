@@ -269,7 +269,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
 
   switch(sa->sa_family) {
     case AF_INET:
-      si = (struct sockaddr_in *)(void *) sa;
+      si = (struct sockaddr_in *)sa;
       if(Curl_inet_ntop(sa->sa_family, &si->sin_addr,
                         addr, MAX_IPADR_LEN)) {
         unsigned short us_port = ntohs(si->sin_port);
@@ -279,7 +279,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
       break;
 #ifdef USE_IPV6
     case AF_INET6:
-      si6 = (struct sockaddr_in6 *)(void *) sa;
+      si6 = (struct sockaddr_in6 *)sa;
       if(Curl_inet_ntop(sa->sa_family, &si6->sin6_addr,
                         addr, MAX_IPADR_LEN)) {
         unsigned short us_port = ntohs(si6->sin6_port);
@@ -1048,8 +1048,8 @@ static bool cf_he_data_pending(struct Curl_cfilter *cf,
 }
 
 static struct curltime get_max_baller_time(struct Curl_cfilter *cf,
-                                          struct Curl_easy *data,
-                                          int query)
+                                           struct Curl_easy *data,
+                                           int query)
 {
   struct cf_he_ctx *ctx = cf->ctx;
   struct curltime t, tmax;
