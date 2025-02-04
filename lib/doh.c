@@ -917,8 +917,7 @@ static CURLcode doh2ai(const struct dohentry *de, const char *hostname,
       result = CURLE_OUT_OF_MEMORY;
       break;
     }
-    ai->ai_addr = (struct sockaddr *)
-      ((char *)ai + sizeof(struct Curl_addrinfo));
+    ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
     ai->ai_canonname = ((char *)ai->ai_addr + ss_size);
     memcpy(ai->ai_canonname, hostname, hostlen);
 

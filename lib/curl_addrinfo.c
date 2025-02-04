@@ -163,8 +163,7 @@ Curl_getaddrinfo_ex(const char *nodename,
     ca->ai_canonname = NULL;
     ca->ai_next      = NULL;
 
-    ca->ai_addr = (struct sockaddr *)
-      ((char *)ca + sizeof(struct Curl_addrinfo));
+    ca->ai_addr = (void *)((char *)ca + sizeof(struct Curl_addrinfo));
     memcpy(ca->ai_addr, ai->ai_addr, ss_size);
 
     if(namelen) {
@@ -291,8 +290,7 @@ Curl_he2ai(const struct hostent *he, int port)
       break;
     }
     /* put the address after the struct */
-    ai->ai_addr = (struct sockaddr *)
-      ((char *)ai + sizeof(struct Curl_addrinfo));
+    ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
     /* then put the name after the address */
     ai->ai_canonname = (char *)ai->ai_addr + ss_size;
     memcpy(ai->ai_canonname, he->h_name, namelen);
@@ -384,7 +382,7 @@ Curl_ip2addr(CURL_SA_FAMILY_T af, const void *inaddr, const char *hostname,
   if(!ai)
     return NULL;
   /* put the address after the struct */
-  ai->ai_addr = (struct sockaddr *)((char *)ai + sizeof(struct Curl_addrinfo));
+  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
   /* then put the name after the address */
   ai->ai_canonname = (char *)ai->ai_addr + addrsize;
   memcpy(ai->ai_canonname, hostname, namelen);
@@ -455,7 +453,7 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
   ai = calloc(1, sizeof(struct Curl_addrinfo) + sizeof(struct sockaddr_un));
   if(!ai)
     return NULL;
-  ai->ai_addr = (struct sockaddr *)((char *)ai + sizeof(struct Curl_addrinfo));
+  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
 
   sa_un = (struct sockaddr_un *) ai->ai_addr;
   sa_un->sun_family = AF_UNIX;
