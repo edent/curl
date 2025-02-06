@@ -339,6 +339,8 @@ struct GlobalConfig {
   unsigned short parallel_max; /* MAX_PARALLEL is the maximum */
   bool parallel_connect;
   char *help_category;            /* The help category, if set */
+  char *knownhosts;               /* known host path, if set. curl_free()
+                                     this */
   struct tool_var *variables;
   struct OperationConfig *first;
   struct OperationConfig *current;
